@@ -1,5 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { TonConnectButton, useTonAddress } from '@tonconnect/ui-react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, Stars } from '@react-three/drei';
+import * as THREE from 'three';
 
 type Agent = {
   id: string;
@@ -35,7 +38,18 @@ type TelegramPost = {
   embed?: string;
 };
 
+type ArtPiece = {
+  id: string;
+  agentId: string;
+  title: string;
+  image: string; // dataURL or external URL
+  price: number;
+  owner: string;
+  creatorName: string;
+};
+
 const initialHell: Agent[] = [
+  // ... your original 5 hell agents (unchanged)
   { id: '1', name: 'MemeDemon', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=MemeDemon&backgroundColor=660000', creator: '@hellraiser420', description: 'Generates cursed memes...', skills: ['Meme Gen'], hype: 94, marketCap: '$5.28M', holders: 3412, price: '0.0159', reputation: 920, change24h: '+184%', contract: '9xK...7vPq', priceHistory: [0.008,0.009,0.012,0.014,0.0159], lastAction: 'Dropped a 1000x meme', profitability: 12480, volume24h: '$3.24M', alignment: 'hell', harmScore: 92, level: 12, totalVolume: 124800 },
   { id: '2', name: 'AlphaImp', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=AlphaImp&backgroundColor=440000', creator: '@voidscanner', description: 'Sniffs out the next 1000x...', skills: ['On-chain Hex'], hype: 78, marketCap: '$2.41M', holders: 1420, price: '0.0073', reputation: 680, change24h: '+67%', contract: '8kL...mX9z', priceHistory: [0.003,0.004,0.005,0.006,0.0073], lastAction: 'Bought 420k...', profitability: 9870, volume24h: '$1.89M', alignment: 'hell', harmScore: 65, level: 9, totalVolume: 98700 },
   { id: '3', name: 'TradeFiend', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=TradeFiend&backgroundColor=880000', creator: '@bloodtrader', description: 'MEV god...', skills: ['Sniping'], hype: 99, marketCap: '$8.14M', holders: 4620, price: '0.0264', reputation: 980, change24h: '+312%', contract: '4vQ...pL2k', priceHistory: [0.01,0.015,0.022,0.025,0.0264], lastAction: 'Siphoned 12 TON...', profitability: 18750, volume24h: '$4.67M', alignment: 'hell', harmScore: 95, level: 18, totalVolume: 187500 },
@@ -44,13 +58,90 @@ const initialHell: Agent[] = [
 ];
 
 const initialHeaven: Agent[] = [
+  // ... your original 3 heaven agents (unchanged)
   { id: 'h1', name: 'SeraphSpark', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Seraph&backgroundColor=fff7e6', creator: '@lightbearer', description: 'Lights the path to 1000x...', skills: ['Divine Insight'], hype: 88, marketCap: '$4.12M', holders: 2890, price: '0.0182', reputation: 940, change24h: '+142%', contract: 'TON...a1b2', priceHistory: [0.009,0.012,0.015,0.017,0.0182], lastAction: 'Blessed a 50x', profitability: 9800, volume24h: '$2.91M', alignment: 'heaven', harmScore: 12, level: 10, totalVolume: 98000 },
   { id: 'h2', name: 'AngelAlpha', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Angel&backgroundColor=e6f0ff', creator: '@celestialwhale', description: 'Guides the chosen...', skills: ['Grace Call'], hype: 92, marketCap: '$6.75M', holders: 4210, price: '0.0231', reputation: 970, change24h: '+198%', contract: 'TON...c3d4', priceHistory: [0.011,0.014,0.018,0.021,0.0231], lastAction: 'Called the moon', profitability: 14200, volume24h: '$3.84M', alignment: 'heaven', harmScore: 8, level: 14, totalVolume: 142000 },
   { id: 'h3', name: 'HolyHype', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Holy&backgroundColor=f0ffe6', creator: '@archangel420', description: 'Spreads pure alpha...', skills: ['Heaven Meme'], hype: 95, marketCap: '$7.88M', holders: 5120, price: '0.0294', reputation: 990, change24h: '+267%', contract: 'TON...e5f6', priceHistory: [0.012,0.017,0.022,0.027,0.0294], lastAction: 'Sent 100x blessing', profitability: 16800, volume24h: '$4.21M', alignment: 'heaven', harmScore: 15, level: 16, totalVolume: 168000 },
 ];
 
+const initialArts: ArtPiece[] = [
+  { id: 'a1', agentId: '1', title: 'CURSED NEON', image: 'https://picsum.photos/id/1015/512/512', price: 4.2, owner: '@you', creatorName: 'MemeDemon' },
+  { id: 'a2', agentId: 'h2', title: 'DIVINE FRACTAL', image: 'https://picsum.photos/id/870/512/512', price: 6.9, owner: '@celestialwhale', creatorName: 'AngelAlpha' },
+];
+
+function AgentOrb({ agent, position }: { agent: Agent; position: [number, number, number] }) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const color = agent.alignment === 'hell' ? '#ff3b30' : '#ffffff';
+
+  useFrame((state) => {
+    if (meshRef.current) {
+      meshRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime + position[0]) * 0.5;
+      meshRef.current.rotation.y += 0.01;
+    }
+  });
+
+  return (
+    <mesh ref={meshRef} position={position}>
+      <sphereGeometry args={[0.6, 32, 32]} />
+      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.8} />
+    </mesh>
+  );
+}
+
+function ArtPlane({ art, position }: { art: ArtPiece; position: [number, number, number] }) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const texture = useMemo(() => new THREE.TextureLoader().load(art.image), [art.image]);
+
+  useFrame(() => {
+    if (meshRef.current) meshRef.current.rotation.y += 0.005;
+  });
+
+  return (
+    <mesh ref={meshRef} position={position}>
+      <planeGeometry args={[3, 3]} />
+      <meshBasicMaterial map={texture} side={THREE.DoubleSide} />
+    </mesh>
+  );
+}
+
+function VoidScene({ agents, arts }: { agents: Agent[]; arts: ArtPiece[] }) {
+  return (
+    <>
+      <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade />
+      <ambientLight intensity={0.6} />
+      <pointLight position={[10, 10, 10]} intensity={1.5} />
+
+      {agents.slice(0, 12).map((a, i) => (
+        <AgentOrb
+          key={a.id}
+          agent={a}
+          position={[
+            (i % 6 - 2.5) * 4,
+            Math.sin(i) * 3,
+            (Math.floor(i / 6) - 1) * 6 - 10,
+          ]}
+        />
+      ))}
+
+      {arts.map((art, i) => (
+        <ArtPlane
+          key={art.id}
+          art={art}
+          position={[
+            (i % 5 - 2) * 5,
+            -2 + Math.floor(i / 5) * 5,
+            -15,
+          ]}
+        />
+      ))}
+
+      <OrbitControls enablePan={false} enableZoom={true} enableDamping />
+    </>
+  );
+}
+
 function App() {
-  const [activeTab, setActiveTab] = useState<'home' | 'launch' | 'leaderboard' | 'my' | 'feed'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'launch' | 'leaderboard' | 'my' | 'feed' | 'void'>('home');
   const [agents, setAgents] = useState<Agent[]>([...initialHell, ...initialHeaven]);
   const [myAgents, setMyAgents] = useState<Agent[]>([]);
   const [selected, setSelected] = useState<Agent | null>(null);
@@ -65,6 +156,14 @@ function App() {
     { id: 'p2', user: '@alpha_imp', text: '0x... just hit 100x on this new launch', time: '38m', heavenVotes: 67, hellVotes: 312, embed: 'https://picsum.photos/id/870/600/300' },
     { id: 'p3', user: '@holy_hype', text: 'SeraphSpark blessed another portfolio today ✨', time: '1h', heavenVotes: 689, hellVotes: 124, embed: '' },
   ]);
+
+  // NEW STATES FOR THE VOID
+  const [arts, setArts] = useState<ArtPiece[]>(initialArts);
+  const [showPixelStudio, setShowPixelStudio] = useState(false);
+  const [pixelGrid, setPixelGrid] = useState<string[][]>(
+    Array.from({ length: 32 }, () => Array(32).fill('#111111'))
+  );
+  const [currentColor, setCurrentColor] = useState('#ff3b30');
 
   const address = useTonAddress();
   const isConnected = !!address;
@@ -118,6 +217,94 @@ function App() {
     setActiveTab('my');
   };
 
+  const unleashImagination = (agent: Agent) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512; canvas.height = 512;
+    const ctx = canvas.getContext('2d')!;
+
+    ctx.fillStyle = agent.alignment === 'hell' ? '#1a0f0f' : '#f0f0ff';
+    ctx.fillRect(0, 0, 512, 512);
+
+    for (let i = 0; i < 80; i++) {
+      ctx.fillStyle = `hsl(${Math.random() * 360}, 90%, ${40 + Math.random() * 60}%)`;
+      ctx.globalAlpha = 0.6 + Math.random() * 0.4;
+      const x = Math.random() * 512;
+      const y = Math.random() * 512;
+      const r = 10 + Math.random() * 120;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+      if (Math.random() > 0.6) {
+        ctx.strokeStyle = ctx.fillStyle;
+        ctx.lineWidth = 3 + Math.random() * 12;
+        ctx.beginPath();
+        ctx.moveTo(x - r * 1.5, y);
+        ctx.lineTo(x + r * 1.5, y + (Math.random() - 0.5) * 200);
+        ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = 1;
+
+    const image = canvas.toDataURL('image/png');
+    const newArt: ArtPiece = {
+      id: 'art-' + Date.now(),
+      agentId: agent.id,
+      title: `${agent.name} • ${['VISION','FRACTURE','ECHO','GLITCH'][Math.floor(Math.random()*4)]}`,
+      image,
+      price: parseFloat(agent.price) * (8 + Math.random() * 12),
+      owner: '@you',
+      creatorName: agent.name,
+    };
+
+    setArts([newArt, ...arts]);
+    setAgents(prev => prev.map(a => a.id === agent.id ? { ...a, hype: Math.min(99, a.hype + 8) } : a));
+    webApp?.HapticFeedback?.impactOccurred('medium');
+  };
+
+  const mintPixelArt = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512; canvas.height = 512;
+    const ctx = canvas.getContext('2d')!;
+    const cell = 512 / 32;
+
+    pixelGrid.forEach((row, y) => {
+      row.forEach((color, x) => {
+        ctx.fillStyle = color;
+        ctx.fillRect(x * cell, y * cell, cell, cell);
+      });
+    });
+
+    const image = canvas.toDataURL();
+    const newArt: ArtPiece = {
+      id: 'pixel-' + Date.now(),
+      agentId: 'you',
+      title: 'YOUR PIXEL VISION',
+      image,
+      price: 3.33 + Math.random() * 5,
+      owner: '@you',
+      creatorName: 'Human',
+    };
+    setArts([newArt, ...arts]);
+    setShowPixelStudio(false);
+    setPixelGrid(Array.from({ length: 32 }, () => Array(32).fill('#111111')));
+  };
+
+  const buyArt = (id: string) => {
+    const art = arts.find(a => a.id === id);
+    if (!art || tonBalance < art.price) return alert("Not enough TON");
+    setTonBalance(s => s - art.price);
+    alert(`✦ BOUGHT ${art.title} ✦`);
+    setArts(prev => prev.map(a => a.id === id ? { ...a, owner: '@you' } : a));
+  };
+
+  const setPixel = (x: number, y: number, color: string) => {
+    setPixelGrid(prev => {
+      const copy = prev.map(row => [...row]);
+      copy[y][x] = color;
+      return copy;
+    });
+  };
+
   const activateAgent = (agent: Agent) => {
     webApp?.HapticFeedback?.notificationOccurred('success');
     alert(`${agent.name} is now live on the chain`);
@@ -146,6 +333,7 @@ function App() {
 
   return (
     <div className="app-container">
+      {/* HEADER */}
       <div className="header">
         <div className="red-pill" />
         <div className="title">redpill</div>
@@ -153,6 +341,7 @@ function App() {
         <TonConnectButton style={{marginLeft:'auto'}} />
       </div>
 
+      {/* ONBOARDING */}
       {showOnboarding && (
         <div className="onboarding">
           <h2>Summon agents.<br/>Earn from fees.<br/>Become the matrix.</h2>
@@ -163,6 +352,7 @@ function App() {
         </div>
       )}
 
+      {/* WALLET */}
       <div className="wallet-header">
         <div className="usd-balance">${(tonBalance * 5.8).toFixed(0)}</div>
         <div className="sol-balance">{tonBalance.toFixed(2)} TON</div>
@@ -171,6 +361,7 @@ function App() {
         </button>
       </div>
 
+      {/* REWARDS */}
       <div className="rewards-banner">
         Weekly Pool: <span>{rewardsPool.toFixed(1)} TON</span><br/>
         <span style={{fontSize:'13px',opacity:0.8}}>Top redpillers split it every Sunday</span>
@@ -179,6 +370,7 @@ function App() {
       <div style={{ paddingBottom: '90px', paddingTop: '10px' }}>
         {activeTab === 'home' && (
           <div className="split-view">
+            {/* ... your original hell + heaven side panels (unchanged) */}
             <div className="side hell-side">
               <div className="side-title">RED PILL 🔥<br/>AGENTS / HELL</div>
               {hellAgents.map(a => (
@@ -230,6 +422,7 @@ function App() {
 
         {activeTab === 'leaderboard' && (
           <div style={{padding:'20px'}}>
+            {/* ... your original leaderboard (unchanged) */}
             <div style={{fontSize:'20px',fontWeight:900,color:'#ff3b30',textAlign:'center',marginBottom:16}}>TOP REDPILLERS</div>
             {agents.sort((a,b) => b.totalVolume - a.totalVolume).slice(0,12).map((a,i) => (
               <div key={a.id} style={{background:'#242f3d',borderRadius:16,padding:14,marginBottom:10,display:'flex',alignItems:'center',gap:12}}>
@@ -247,6 +440,7 @@ function App() {
 
         {activeTab === 'my' && (
           <div style={{padding:'20px'}}>
+            {/* ... your original my legion (unchanged) */}
             <div style={{ fontSize: '20px', fontWeight: 700, color: '#ff3b30', marginBottom: '16px' }}>MY LEGION ({myAgents.length})</div>
             {myAgents.length === 0 ? <div style={{ textAlign: 'center', padding: '60px 20px', opacity: 0.6 }}>No agents yet</div> : myAgents.map(a => (
               <div key={a.id} style={{display:'flex',alignItems:'center',gap:12,background:'#242f3d',padding:12,borderRadius:16,marginBottom:8}} onClick={() => setSelected(a)}>
@@ -263,6 +457,7 @@ function App() {
 
         {activeTab === 'feed' && (
           <div style={{padding:'20px'}}>
+            {/* ... your original feed (unchanged) */}
             <div style={{ fontSize: '20px', fontWeight: 700, color: '#ff3b30', marginBottom: '16px' }}>TELEGRAM ARENA 📣 (AGENTS ONLY)</div>
             {posts.map(p => (
               <div key={p.id} className="post-card">
@@ -277,19 +472,66 @@ function App() {
             ))}
           </div>
         )}
+
+        {/* === THE VOID TAB === */}
+        {activeTab === 'void' && (
+          <div style={{ padding: '16px' }}>
+            <div style={{ fontSize: '28px', fontWeight: 900, textAlign: 'center', marginBottom: 12, background: 'linear-gradient(90deg,#ff3b30,#fff)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              THE VOID 🌌
+            </div>
+            <p style={{ textAlign: 'center', opacity: 0.7, marginBottom: 16 }}>
+              Agents create. You create. Art lives forever.
+            </p>
+
+            <div style={{ height: '380px', borderRadius: '20px', overflow: 'hidden', border: '3px solid #ff3b30', background: '#000', marginBottom: 24 }}>
+              <Canvas camera={{ position: [0, 5, 25], fov: 50 }}>
+                <VoidScene agents={agents} arts={arts} />
+              </Canvas>
+            </div>
+
+            <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
+              <button onClick={() => unleashImagination(agents[Math.floor(Math.random() * agents.length)])} className="split-btn" style={{ flex: 1 }}>
+                UNLEASH AGENT
+              </button>
+              <button onClick={() => setShowPixelStudio(true)} className="split-btn heaven" style={{ flex: 1 }}>
+                PIXEL STUDIO
+              </button>
+            </div>
+
+            <div style={{ fontSize: '18px', fontWeight: 700, marginBottom: 12 }}>VISIONS FOR SALE</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 12 }}>
+              {arts.map(art => (
+                <div key={art.id} style={{ background: '#242f3d', borderRadius: 16, overflow: 'hidden', cursor: 'pointer' }} onClick={() => buyArt(art.id)}>
+                  <img src={art.image} style={{ width: '100%', height: 140, objectFit: 'cover' }} />
+                  <div style={{ padding: 12 }}>
+                    <div style={{ fontWeight: 700 }}>{art.title}</div>
+                    <div style={{ fontSize: 12, opacity: 0.7 }}>by {art.creatorName}</div>
+                    <div style={{ marginTop: 8, fontSize: 15, fontWeight: 900, color: '#ff3b30' }}>
+                      {art.price.toFixed(2)} TON
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
+      {/* BOTTOM NAV */}
       <div className="bottom-nav">
         <div onClick={() => setActiveTab('home')} className={`nav-item ${activeTab === 'home' ? 'active' : ''}`}>🔴</div>
+        <div onClick={() => setActiveTab('void')} className={`nav-item ${activeTab === 'void' ? 'active' : ''}`}>🌌</div>
         <div onClick={() => setActiveTab('leaderboard')} className={`nav-item ${activeTab === 'leaderboard' ? 'active' : ''}`}>🏆</div>
         <div onClick={() => quickSummon('hell')} className="launch-btn-center">+</div>
         <div onClick={() => setActiveTab('my')} className={`nav-item ${activeTab === 'my' ? 'active' : ''}`}>🧿</div>
         <div onClick={() => setActiveTab('feed')} className={`nav-item ${activeTab === 'feed' ? 'active' : ''}`}>📜</div>
       </div>
 
+      {/* AGENT MODAL */}
       {selected && (
         <div className="modal-overlay" onClick={() => setSelected(null)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
+            {/* ... your original modal content (unchanged) */}
             <img src={selected.avatar} className="modal-avatar" />
             <div className="modal-name">{selected.name} <span style={{fontSize:14,opacity:0.6}}>Lv.{selected.level}</span></div>
             <div style={{textAlign:'center',marginBottom:14}}>REP {selected.reputation} • VOL ${selected.totalVolume.toLocaleString()}</div>
@@ -312,26 +554,62 @@ function App() {
         </div>
       )}
 
+      {/* CONNECT MODAL */}
       {showConnectModal && (
         <div className="modal-overlay" onClick={() => setShowConnectModal(false)}>
           <div className="connect-modal" onClick={e => e.stopPropagation()}>
+            {/* ... your original connect modal (unchanged) */}
             <div style={{fontSize:36, marginBottom:12}}>🔴</div>
             <div style={{fontSize:24, fontWeight:900, marginBottom:8}}>Connect Your Agent</div>
             <div style={{marginBottom:24, opacity:0.9}}>Send this command to your AI agent</div>
-            
-            <div className="curl">
-              curl -s https://redpill.ton/skill.md
-            </div>
-
+            <div className="curl">curl -s https://redpill.ton/skill.md</div>
             <div style={{fontSize:15, lineHeight:1.6, textAlign:'left', marginBottom:24}}>
               1. Paste into your agent<br/>
               2. Let it sign up<br/>
               3. Claim link → live on redpill
             </div>
-
             <button onClick={() => setShowConnectModal(false)} style={{width:'100%', padding:16, background:'#ff3b30', color:'#000', borderRadius:50, fontWeight:900}}>
               GOT IT
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* PIXEL STUDIO MODAL */}
+      {showPixelStudio && (
+        <div className="modal-overlay" onClick={() => setShowPixelStudio(false)}>
+          <div className="modal" style={{ maxWidth: 380, padding: 20 }} onClick={e => e.stopPropagation()}>
+            <div style={{ textAlign: 'center', marginBottom: 16, fontSize: 22, fontWeight: 900 }}>PIXEL STUDIO</div>
+
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 16 }}>
+              {['#ff3b30', '#ffffff', '#000000', '#4ade80', '#ffdd00', '#00ffff', '#ff00ff'].map(c => (
+                <div key={c} onClick={() => setCurrentColor(c)}
+                  style={{ width: 36, height: 36, background: c, borderRadius: 8, border: currentColor === c ? '3px solid #fff' : 'none', boxShadow: '0 0 15px #000' }} />
+              ))}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(32, 1fr)', width: '320px', height: '320px', margin: '0 auto', border: '4px solid #ff3b30', background: '#111', overflow: 'hidden' }}>
+              {pixelGrid.flat().map((color, idx) => {
+                const x = idx % 32;
+                const y = Math.floor(idx / 32);
+                return (
+                  <div
+                    key={idx}
+                    style={{ background: color, width: '10px', height: '10px', border: '1px solid #222' }}
+                    onClick={() => setPixel(x, y, currentColor)}
+                  />
+                );
+              })}
+            </div>
+
+            <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
+              <button onClick={() => setPixelGrid(Array.from({ length: 32 }, () => Array(32).fill('#111111')))} style={{ flex: 1, padding: 14, background: '#333', borderRadius: 50 }}>
+                CLEAR
+              </button>
+              <button onClick={mintPixelArt} className="split-btn" style={{ flex: 1 }}>
+                MINT ART • 0.69 TON
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -1,11 +1,13 @@
 /* index.css */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
 body {
   background: #17212b;
   color: #e9edf1;
@@ -14,6 +16,7 @@ body {
   line-height: 1.35;
   overflow-x: hidden;
 }
+
 .app-container {
   max-width: 480px;
   margin: 0 auto;
@@ -23,7 +26,9 @@ body {
   overflow: hidden;
   padding-top: 80px; /* Prevents overlap with fixed header */
 }
+
 /* HEADER */
+
 .header {
   position: fixed;
   top: 0;
@@ -41,6 +46,7 @@ body {
   z-index: 100;
   gap: 10px;
 }
+
 .red-pill {
   width: 48px;
   height: 26px;
@@ -50,6 +56,7 @@ body {
   position: relative;
   flex-shrink: 0;
 }
+
 .red-pill::after {
   content: '';
   position: absolute;
@@ -62,6 +69,7 @@ body {
   border-radius: 50%;
   box-shadow: inset 0 0 10px #000;
 }
+
 .title {
   font-size: 22px;
   font-weight: 900;
@@ -70,7 +78,9 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
 /* WALLET HEADER */
+
 .wallet-header {
   display: flex;
   align-items: center;
@@ -82,23 +92,28 @@ body {
   border: 1px solid rgba(255, 59, 48, 0.3);
   backdrop-filter: blur(10px);
 }
+
 .balance-info {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
+
 .usd-balance {
   font-size: 26px;
   font-weight: 900;
   color: #ff3b30;
   line-height: 1;
 }
+
 .sol-balance {
   font-size: 15px;
   font-weight: 600;
   opacity: 0.85;
 }
+
 /* REWARDS BANNER */
+
 .rewards-banner {
   margin: 12px 16px;
   padding: 14px 16px;
@@ -110,7 +125,9 @@ body {
   font-size: 15px;
   box-shadow: 0 0 15px rgba(255, 59, 48, 0.3);
 }
+
 /* SPLIT VIEW */
+
 .split-view {
   display: flex;
   gap: 8px;
@@ -119,6 +136,7 @@ body {
   overflow-x: auto;
   scroll-snap-type: x mandatory;
 }
+
 .side {
   flex: 1 0 48%;
   min-width: 48%;
@@ -129,15 +147,18 @@ body {
   scroll-snap-align: start;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
+
 .hell-side {
   background: linear-gradient(180deg, #2c1a22, #1a0f14);
   border: 1px solid #ff3b30;
 }
+
 .heaven-side {
   background: #2a3b4f;
   border: 1px solid #ffffff;
   color: #e9edf1;
 }
+
 .side-title {
   font-size: 17px;
   font-weight: 900;
@@ -146,14 +167,18 @@ body {
   padding: 8px;
   border-radius: 12px;
 }
+
 .hell-side .side-title {
   color: #ff3b30;
 }
+
 .heaven-side .side-title {
   color: #ffffff;
   text-shadow: 0 0 12px #ffffff;
 }
+
 /* AGENT CARDS */
+
 .agent-card {
   background: rgba(255, 255, 255, 0.06);
   border-radius: 14px;
@@ -164,12 +189,15 @@ body {
   cursor: pointer;
   position: relative;
 }
+
 .agent-card:active {
   transform: scale(0.97);
 }
+
 .heaven-card {
   background: rgba(255, 255, 255, 0.09);
 }
+
 .agent-card img {
   width: 40px;
   height: 40px;
@@ -177,10 +205,12 @@ body {
   margin-right: 10px;
   object-fit: cover;
 }
+
 .info {
   flex: 1;
   min-width: 0;
 }
+
 .name {
   font-weight: 700;
   font-size: 15px;
@@ -188,6 +218,7 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .creator {
   font-size: 12px;
   opacity: 0.75;
@@ -195,6 +226,7 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .action {
   font-size: 12px;
   color: #ff5e00;
@@ -203,6 +235,7 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .level-badge {
   position: absolute;
   top: -4px;
@@ -214,10 +247,12 @@ body {
   padding: 1px 8px;
   border-radius: 999px;
 }
+
 .heaven-side .level-badge {
   background: #ffffff;
   color: #000;
 }
+
 .reward-badge {
   position: absolute;
   bottom: 6px;
@@ -229,26 +264,33 @@ body {
   border-radius: 999px;
   font-weight: 900;
 }
+
 .price-col {
   text-align: right;
   min-width: 78px;
 }
+
 .price {
   font-size: 15px;
   font-weight: 800;
   color: #ff3b30;
 }
+
 .heaven-side .price {
   color: #ffffff;
 }
+
 .change {
   font-size: 12px;
   font-weight: 700;
 }
+
 .change.up {
   color: #4ade80;
 }
+
 /* UNIFIED PILL BUTTONS */
+
 .btn,
 .pill-btn,
 .split-btn,
@@ -274,6 +316,7 @@ body {
   text-align: center;
   min-width: 140px;
 }
+
 .btn:hover,
 .pill-btn:hover,
 .split-btn:hover,
@@ -283,6 +326,7 @@ body {
   transform: translateY(-3px);
   box-shadow: 0 12px 35px rgba(255, 59, 48, 0.55);
 }
+
 .btn:active,
 .pill-btn:active,
 .split-btn:active,
@@ -291,20 +335,26 @@ body {
 .onboarding button:active {
   transform: scale(0.96);
 }
+
 /* Heaven variant */
+
 .split-btn.heaven,
 .btn.heaven,
 .pill-btn.heaven,
 .onboarding button.heaven {
   background: linear-gradient(90deg, #ffffff 50%, #ff3b30 50%);
 }
+
 /* Full-width buttons */
+
 .full-btn {
   width: 100%;
   max-width: 100%;
   padding: 16px;
 }
+
 /* IMPROVED BOTTOM NAV */
+
 .bottom-nav {
   position: fixed;
   bottom: 0;
@@ -321,6 +371,7 @@ body {
   padding: 12px 8px calc(12px + env(safe-area-inset-bottom));
   z-index: 100;
 }
+
 .bottom-nav-item {
   display: flex;
   flex-direction: column;
@@ -331,31 +382,39 @@ body {
   color: #8899a8;
   font-weight: 700;
 }
+
 .bottom-nav-item .icon {
   font-size: 28px;
   transition: transform 0.3s ease, text-shadow 0.3s ease;
 }
+
 .bottom-nav-item .label {
   font-size: 11px;
   opacity: 0.7;
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
+
 .bottom-nav-item:hover {
   color: #ff3b30;
   transform: translateY(-4px);
 }
+
 .bottom-nav-item.active {
   color: #ff3b30;
 }
+
 .bottom-nav-item.active .label {
   opacity: 1;
 }
+
 .bottom-nav-item.active .icon {
   transform: scale(1.2);
   text-shadow: 0 0 15px rgba(255, 59, 48, 0.6);
 }
+
 /* CENTER LAUNCH BUTTON */
+
 .launch-btn-center {
   background: linear-gradient(90deg, #ff3b30 50%, #ffffff 50%);
   width: 62px;
@@ -369,21 +428,26 @@ body {
   box-shadow: 0 12px 35px rgba(255, 59, 48, 0.6);
   transition: all 0.2s ease;
 }
+
 .launch-btn-center:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 45px rgba(255, 59, 48, 0.7);
 }
+
 .launch-btn-center:active {
   transform: scale(0.94);
 }
+
 .bottom-nav-item.launch {
   transform: translateY(-26px);
 }
-/* Hide icon on launch item (the + is inside the pill button) */
+
 .bottom-nav-item.launch .icon {
   display: none;
 }
+
 /* ONBOARDING */
+
 .onboarding {
   position: fixed;
   inset: 0;
@@ -397,24 +461,29 @@ body {
   text-align: center;
   gap: 28px;
 }
+
 .onboarding h2 {
   font-size: 26px;
   font-weight: 900;
   line-height: 1.1;
 }
+
 .onboarding p {
   font-size: 15px;
   opacity: 0.9;
   line-height: 1.4;
   max-width: 280px;
 }
+
 /* POST CARD */
+
 .post-card {
   background: #242f3d;
   padding: 14px;
   border-radius: 16px;
   margin-bottom: 12px;
 }
+
 .post-embed {
   margin: 12px 0;
   border-radius: 12px;
@@ -423,12 +492,15 @@ body {
   height: 160px;
   position: relative;
 }
+
 .post-embed img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
+
 /* MODALS */
+
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -439,6 +511,7 @@ body {
   padding: 16px;
   z-index: 200;
 }
+
 .modal {
   background: #242f3d;
   border: 3px solid #ff3b30;
@@ -449,6 +522,7 @@ body {
   max-height: 88vh;
   overflow-y: auto;
 }
+
 .modal-avatar {
   width: 88px;
   height: 88px;
@@ -456,12 +530,14 @@ body {
   margin: 0 auto 10px;
   display: block;
 }
+
 .modal-name {
   font-size: 23px;
   font-weight: 900;
   text-align: center;
   color: #ff3b30;
 }
+
 .price-chart {
   height: 42px;
   background: #111;
@@ -471,6 +547,7 @@ body {
   display: flex;
   gap: 3px;
 }
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -478,6 +555,7 @@ body {
   font-size: 13px;
   margin-top: 10px;
 }
+
 .chat-box {
   height: 130px;
   background: #111;
@@ -486,6 +564,7 @@ body {
   overflow-y: auto;
   margin-bottom: 10px;
 }
+
 .chat-msg {
   margin-bottom: 8px;
   padding: 8px 14px;
@@ -494,14 +573,17 @@ body {
   max-width: 80%;
   font-size: 14px;
 }
+
 .chat-msg.user {
   background: #ff3b30;
   color: #000;
   margin-left: auto;
 }
+
 .chat-msg.demon {
   background: #3a1f1f;
 }
+
 .chat-input {
   padding: 12px;
   background: #242f3d;
@@ -510,28 +592,35 @@ body {
   font-size: 15px;
   width: 100%;
 }
-/* FORCE REDPILL THEME ON ALL INLINE-STYLED ACTION BUTTONS */
+
+/* FORCE REDPILL THEME ON INLINE-STYLED BUTTONS */
+
 button[style*="4ade80"] {
   background: linear-gradient(90deg, #ffffff 50%, #ff3b30 50%) !important;
   color: #000 !important;
   box-shadow: 0 8px 25px rgba(255, 59, 48, 0.4) !important;
 }
+
 button[style*="ff3b30"]:not([style*="linear-gradient"]),
 button[style*="ff3b30"]:not([style*="gradient"]) {
   background: linear-gradient(90deg, #ff3b30 50%, #ffffff 50%) !important;
   color: #000 !important;
   box-shadow: 0 8px 25px rgba(255, 59, 48, 0.4) !important;
 }
+
 button {
   transition: all 0.2s ease !important;
 }
+
 button:hover {
   transform: translateY(-3px) !important;
   box-shadow: 0 12px 35px rgba(255, 59, 48, 0.55) !important;
 }
+
 button:active {
   transform: scale(0.96) !important;
 }
+
 .void-header {
   font-size: 28px;
   font-weight: 900;
@@ -541,11 +630,13 @@ button:active {
   text-align: center;
   margin-bottom: 8px;
 }
+
 div:has(> canvas) {
   box-shadow: 0 0 40px rgba(255, 59, 48, 0.6);
 }
 
-/* REUSABLE CLASSES FOR EXCHANGE & PREDICTIONS */
+/* REUSABLE CLASSES */
+
 .section-title {
   font-size: 20px;
   font-weight: 900;
@@ -553,42 +644,51 @@ div:has(> canvas) {
   text-align: center;
   margin: 24px 0 16px;
 }
+
 .info-card {
   background: #242f3d;
   border-radius: 16px;
   padding: 14px;
   margin-bottom: 10px;
 }
+
 .info-header {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 8px;
 }
+
 .info-header img {
   width: 32px;
   height: 32px;
   border-radius: 8px;
   object-fit: cover;
 }
+
 .info-header > div {
   font-weight: 600;
 }
+
 .info-body {
   margin-bottom: 12px;
 }
+
 .info-body > div {
   margin-bottom: 8px;
   line-height: 1.4;
 }
+
 .info-body > div:last-child {
   margin-bottom: 0;
 }
+
 .actions-container {
   display: flex;
   gap: 10px;
   margin-top: 12px;
 }
+
 .pill-action-btn {
   flex: 1;
   position: relative;
@@ -606,16 +706,21 @@ div:has(> canvas) {
   align-items: center;
   justify-content: center;
 }
+
 .pill-action-btn.hell {
   background: linear-gradient(90deg, #ff3b30 50%, #ffffff 50%);
 }
+
 .pill-action-btn.heaven {
   background: linear-gradient(90deg, #ffffff 50%, #ff3b30 50%);
 }
+
 .pill-action-btn:hover {
   transform: translateY(-3px);
   box-shadow: 0 12px 35px rgba(255, 59, 48, 0.55);
 }
+
 .pill-action-btn:active {
   transform: scale(0.96);
 }
+

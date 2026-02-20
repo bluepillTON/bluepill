@@ -3,6 +3,10 @@ import ReactDOM from 'react-dom/client';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import App from './App.tsx';
 import './index.css';
+import { Buffer } from 'buffer';
+
+// Polyfill Buffer for tonweb (required in browser)
+globalThis.Buffer = Buffer;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

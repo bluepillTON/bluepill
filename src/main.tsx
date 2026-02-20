@@ -10,7 +10,7 @@ globalThis.Buffer = Buffer;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <TonConnectUIProvider manifestUrl={`${window.location.origin}/tonconnect-manifest.json`}>
+    <TonConnectUIProvider manifestUrl="https://bluepillapp.vercel.app/tonconnect-manifest.json">
       <App />
     </TonConnectUIProvider>
   </React.StrictMode>

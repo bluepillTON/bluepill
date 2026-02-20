@@ -1,7 +1,5 @@
 {
-  "url": "https://bluepillTON.vercel.app",
-  "name": "Hell vs Heaven",
-  "iconUrl": "https://bluepillTON.vercel.app/vite.svg",
-  "termsOfUseUrl": "https://bluepillTON.vercel.app/terms",
-  "privacyPolicyUrl": "https://bluepillTON.vercel.app/privacy"
+  "url": "https://bluepillapp.vercel.app",
+  "name": "bluepill",
+  "iconUrl": "https://bluepillapp.vercel.app/vite.svg"
 }
